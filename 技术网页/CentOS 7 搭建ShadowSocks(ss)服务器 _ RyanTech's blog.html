@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<!-- saved from url=(0028)http://ryantech.top/posts/16 -->
+<html lang="zh-CN" class="js"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<meta name="viewport" content="width=device-width">
+	<link rel="profile" href="http://gmpg.org/xfn/11">
+	<link rel="pingback" href="http://ryantech.top/xmlrpc.php">
+	<!--[if lt IE 9]>
+	<script src="http://ryantech.top/wp-content/themes/twentyfifteen/js/html5.js"></script>
+	<![endif]-->
+	<script async="" src="./CentOS 7 搭建ShadowSocks(ss)服务器 _ RyanTech&#39;s blog_files/analytics.js"></script><script>(function(html){html.className = html.className.replace(/\bno-js\b/,'js')})(document.documentElement);</script>
+<title>CentOS 7 搭建ShadowSocks(ss)服务器 | RyanTech's blog</title>
+
+<!-- All in One SEO Pack 2.3.9.2 by Michael Torbert of Semper Fi Web Design[490,555] -->
+<meta name="description" content="在搭建ss服务器之前，先谈一下CentOS 7与CentOS 6在主要使用上的区别。 1、服务管理由service命令变为systemctl命令。支持start、stop和status 3种动作。 2、防火墙由iptables变为firewalld。使用firewall">
+
+<link rel="canonical" href="http://ryantech.top/posts/16">
+<!-- /all in one seo pack -->
+<link rel="dns-prefetch" href="http://fonts.googleapis.com/">
+<link rel="dns-prefetch" href="http://netdna.bootstrapcdn.com/">
+<link rel="dns-prefetch" href="http://s.w.org/">
+<link rel="alternate" type="application/rss+xml" title="RyanTech&#39;s blog » Feed" href="http://ryantech.top/feed">
+<link rel="alternate" type="application/rss+xml" title="RyanTech&#39;s blog » 评论Feed" href="http://ryantech.top/comments/feed">
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/svg\/","svgExt":".svg","source":{"concatemoji":"http:\/\/ryantech.top\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.8.8"}};
+			!function(a,b,c){function d(a){var b,c,d,e,f=String.fromCharCode;if(!k||!k.fillText)return!1;switch(k.clearRect(0,0,j.width,j.height),k.textBaseline="top",k.font="600 32px Arial",a){case"flag":return k.fillText(f(55356,56826,55356,56819),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,56826,8203,55356,56819),0,0),c=j.toDataURL(),b!==c&&(k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447),0,0),c=j.toDataURL(),b!==c);case"emoji4":return k.fillText(f(55358,56794,8205,9794,65039),0,0),d=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55358,56794,8203,9794,65039),0,0),e=j.toDataURL(),d!==e}return!1}function e(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i,j=b.createElement("canvas"),k=j.getContext&&j.getContext("2d");for(i=Array("flag","emoji4"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script><script src="./CentOS 7 搭建ShadowSocks(ss)服务器 _ RyanTech&#39;s blog_files/wp-emoji-release.min.js" type="text/javascript" defer=""></script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel="stylesheet" id="twentyfifteen-fonts-css" href="./CentOS 7 搭建ShadowSocks(ss)服务器 _ RyanTech&#39;s blog_files/css" type="text/css" media="all">
+<link rel="stylesheet" id="genericons-css" href="./CentOS 7 搭建ShadowSocks(ss)服务器 _ RyanTech&#39;s blog_files/genericons.css" type="text/css" media="all">
+<link rel="stylesheet" id="twentyfifteen-style-css" href="./CentOS 7 搭建ShadowSocks(ss)服务器 _ RyanTech&#39;s blog_files/style.css" type="text/css" media="all">
+<!--[if lt IE 9]>
+<link rel='stylesheet' id='twentyfifteen-ie-css'  href='http://ryantech.top/wp-content/themes/twentyfifteen/css/ie.css?ver=20141010' type='text/css' media='all' />
+<![endif]-->
+<!--[if lt IE 8]>
+<link rel='stylesheet' id='twentyfifteen-ie7-css'  href='http://ryantech.top/wp-content/themes/twentyfifteen/css/ie7.css?ver=20141010' type='text/css' media='all' />
+<![endif]-->
+<link rel="stylesheet" id="fontawesome-css" href="./CentOS 7 搭建ShadowSocks(ss)服务器 _ RyanTech&#39;s blog_files/font-awesome.min.css" type="text/css" media="all">
+<!--[if IE 7]>
+<link rel='stylesheet' id='fontawesome-ie-css'  href='//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome-ie7.min.css?ver=1.3.9' type='text/css' media='all' />
+<![endif]-->
+		<style>
+			/* Accessible for screen readers but hidden from view */
+			.fa-hidden { position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
+			.rtl .fa-hidden { left:10000px; }
+			.fa-showtext { margin-right: 5px; }
+		</style>
+		<script type="text/javascript" src="./CentOS 7 搭建ShadowSocks(ss)服务器 _ RyanTech&#39;s blog_files/jquery.js"></script>
+<script type="text/javascript" src="./CentOS 7 搭建ShadowSocks(ss)服务器 _ RyanTech&#39;s blog_files/jquery-migrate.min.js"></script>
+<link rel="https://api.w.org/" href="http://ryantech.top/wp-json/">
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://ryantech.top/xmlrpc.php?rsd">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://ryantech.top/wp-includes/wlwmanifest.xml"> 
+<link rel="prev" title="搭建自己的Blog" href="http://ryantech.top/posts/1">
+<link rel="next" title="MongoDB从2.x升级到3.x后启动失败" href="http://ryantech.top/posts/22">
+<meta name="generator" content="WordPress 4.8.8">
+<link rel="shortlink" href="http://ryantech.top/?p=16">
+<link rel="alternate" type="application/json+oembed" href="http://ryantech.top/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fryantech.top%2Fposts%2F16">
+<link rel="alternate" type="text/xml+oembed" href="http://ryantech.top/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fryantech.top%2Fposts%2F16&amp;format=xml">
+		<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+		<link rel="icon" href="http://ryantech.top/wp-content/uploads/2016/09/logo-150x150.jpg" sizes="32x32">
+<link rel="icon" href="http://ryantech.top/wp-content/uploads/2016/09/logo.jpg" sizes="192x192">
+<link rel="apple-touch-icon-precomposed" href="http://ryantech.top/wp-content/uploads/2016/09/logo.jpg">
+<meta name="msapplication-TileImage" content="http://ryantech.top/wp-content/uploads/2016/09/logo.jpg">
+</head>
+
+<body class="post-template-default single single-post postid-16 single-format-standard">
+<div id="page" class="hfeed site">
+	<a class="skip-link screen-reader-text" href="http://ryantech.top/posts/16#content">跳至正文</a>
+
+	<div id="sidebar" class="sidebar" style="position: fixed; bottom: 0;">
+		<header id="masthead" class="site-header" role="banner">
+			<div class="site-branding">
+										<p class="site-title"><a href="http://ryantech.top/" rel="home">RyanTech's blog</a></p>
+											<p class="site-description">仍然是一个程序员</p>
+									<button class="secondary-toggle">菜单和挂件</button>
+			</div><!-- .site-branding -->
+		</header><!-- .site-header -->
+
+			<div id="secondary" class="secondary">
+
+		
+		
+					<div id="widget-area" class="widget-area" role="complementary">
+				<aside id="wysiwyg_widgets_widget-2" class="widget widget_wysiwyg_widgets_widget"><!-- Widget by WYSIWYG Widgets v2.3.5 - https://wordpress.org/plugins/wysiwyg-widgets/ --><h2 class="widget-title">联系我</h2><p style="text-align: center;"><strong>微信公众号</strong><br>
+<img class="alignnone size-full wp-image-6" src="./CentOS 7 搭建ShadowSocks(ss)服务器 _ RyanTech&#39;s blog_files/qrcode.jpg" alt="qrcode" width="278" height="278"></p>
+<!-- / WYSIWYG Widgets --></aside><aside id="nav_menu-2" class="widget widget_nav_menu"><div class="menu-%e7%a4%be%e4%ba%a4%e5%9b%be%e6%a0%87-container"><ul id="menu-%e7%a4%be%e4%ba%a4%e5%9b%be%e6%a0%87" class="menu"><li id="menu-item-12" class="menu-item menu-item-type-custom menu-item-object-custom social-icon github menu-item-12"><a href="https://github.com/csxrzeng"><i class="icon-2x icon-github "></i><span class="fa-hidden">Github</span></a></li>
+</ul></div></aside><aside id="search-2" class="widget widget_search"><form role="search" method="get" class="search-form" action="http://ryantech.top/">
+				<label>
+					<span class="screen-reader-text">搜索：</span>
+					<input type="search" class="search-field" placeholder="搜索…" value="" name="s">
+				</label>
+				<input type="submit" class="search-submit screen-reader-text" value="搜索">
+			</form></aside><aside id="categories-2" class="widget widget_categories"><h2 class="widget-title">分类目录</h2>		<ul>
+	<li class="cat-item cat-item-2"><a href="http://ryantech.top/posts/category/nodejs">Node.js</a>
+</li>
+	<li class="cat-item cat-item-5"><a href="http://ryantech.top/posts/category/%e6%8a%80%e6%9c%af">技术</a>
+</li>
+	<li class="cat-item cat-item-4"><a href="http://ryantech.top/posts/category/%e6%9d%82%e8%b0%88">杂谈</a>
+</li>
+	<li class="cat-item cat-item-3"><a href="http://ryantech.top/posts/category/web">网站</a>
+</li>
+		</ul>
+</aside><aside id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widget-title">近期评论</h2><ul id="recentcomments"></ul></aside><aside id="archives-2" class="widget widget_archive"><h2 class="widget-title">文章归档</h2>		<ul>
+			<li><a href="http://ryantech.top/posts/date/2017/09">2017年九月</a></li>
+	<li><a href="http://ryantech.top/posts/date/2016/10">2016年十月</a></li>
+	<li><a href="http://ryantech.top/posts/date/2016/09">2016年九月</a></li>
+		</ul>
+		</aside><aside id="wysiwyg_widgets_widget-3" class="widget widget_wysiwyg_widgets_widget"><!-- Widget by WYSIWYG Widgets v2.3.5 - https://wordpress.org/plugins/wysiwyg-widgets/ --><h2 class="widget-title">友情链接</h2><ul style="list-style:none;line-height:2;">
+<li style="border-bottom: 1px solid #eaeaea;"><a href="http://zengrong.net/" target="_blank">zrong’s blog</a></li>
+<li><a href="http://www.worrysprite.net/" target="_blank">WorrySprite随笔录</a></li>
+</ul>
+<!-- / WYSIWYG Widgets --></aside>			</div><!-- .widget-area -->
+		
+	</div><!-- .secondary -->
+
+	</div><!-- .sidebar -->
+
+	<div id="content" class="site-content">
+
+	<div id="primary" class="content-area">
+		<main id="main" class="site-main" role="main">
+
+		
+<article id="post-16" class="post-16 post type-post status-publish format-standard hentry category-5">
+	
+	<header class="entry-header">
+		<h1 class="entry-title">CentOS 7 搭建ShadowSocks(ss)服务器</h1>	</header><!-- .entry-header -->
+
+	<div class="entry-content" deep="5">
+		<p>在搭建ss服务器之前，先谈一下CentOS 7与CentOS 6在主要使用上的区别。<br data-filtered="filtered">
+1、服务管理由service命令变为systemctl命令。支持start、stop和status 3种动作。<br data-filtered="filtered">
+2、防火墙由iptables变为firewalld。使用firewall-cmd进行操作。<br data-filtered="filtered">
+firewalld的配置请参考<a href="http://xn--rhel-9m6fm82bm4d/CentOS%207%E4%BB%A5%E5%8F%8AFedora%E4%B8%AD%E9%85%8D%E7%BD%AEFirewallD" target="_blank">如何在RHEL/CentOS 7以及Fedora中配置FirewallD</a></p>
+<p>注意在查找资料的时候，搜索词应该加上CentOS 7，如： CentOS 7 安装ss服务器。减少搜索到CentOS6内容的机会。以免采用了iptables而使过程不顺利。</p>
+<h3><strong>安装Shadowsocks</strong></h3>
+<blockquote><p>#安装 python setup tools<br data-filtered="filtered">
+yum install python-setuptools -y<br data-filtered="filtered">
+#安装pip<br data-filtered="filtered">
+easy_install pip<br data-filtered="filtered">
+#升级 pip<br data-filtered="filtered">
+pip install –upgrade pip<br data-filtered="filtered">
+#安装 shadowsocks<br data-filtered="filtered">
+pip install shadowsocks</p></blockquote>
+<h3>配置Shadowsocks</h3>
+<blockquote><p>vi /etc/shadowsocks-libev/config.json</p></blockquote>
+<p>然后对照下面的修改</p>
+<blockquote><p>{<br data-filtered="filtered">
+“server”:”0.0.0.0″,<br data-filtered="filtered">
+“server_port”:8989,<br data-filtered="filtered">
+“local_address”: “127.0.0.1”,<br data-filtered="filtered">
+“local_port”:1080,<br data-filtered="filtered">
+“password”:”mypassword”,<br data-filtered="filtered">
+“timeout”:300,<br data-filtered="filtered">
+“method”:”aes-256-cfb”,<br data-filtered="filtered">
+“fast_open”: false,<br data-filtered="filtered">
+“workers”: 1<br data-filtered="filtered">
+}</p></blockquote>
+<p>将上面的<code>mypassword</code>替换成你的密码，<code>server_port</code>也是可以修改的，例如8980，<code>method</code>是加密方式，如果想在路由器上运行的话可以改成<code>rc4-md5</code>这样路由器的负荷会小一些，同时加密的安全性也不错。</p>
+<h2>创建 shadowsocks 服务, 随系统启动</h2>
+<blockquote><p><span class="crayon-o">vim /</span><span class="crayon-v">usr</span><span class="crayon-o">/</span><span class="crayon-v">lib</span><span class="crayon-o">/</span><span class="crayon-v">systemd</span><span class="crayon-o">/</span><span class="crayon-v">system</span><span class="crayon-o">/</span><span class="crayon-v">shadowsocks</span><span class="crayon-e">.service</span></p></blockquote>
+<p>写入下面的内容</p>
+<blockquote><p>[Unit]<br data-filtered="filtered">
+Description=Shadowsocks Server<br data-filtered="filtered">
+Documentation=https://github.com/shadowsocks/shadowsocks<br data-filtered="filtered">
+After=network.target remote-fs.target nss-lookup.target</p>
+<p>[Service]<br data-filtered="filtered">
+Type=forking<br data-filtered="filtered">
+#设置启动时的配置文件,根据自己的需求改.<br data-filtered="filtered">
+ExecStart=/usr/bin/ssserver -c /etc/shadowsocks-libev/config.json<br data-filtered="filtered">
+-d start<br data-filtered="filtered">
+ExecReload=/bin/kill -HUP $MAINPID<br data-filtered="filtered">
+ExecStop=/usr/bin/ssserver -d stop</p>
+<p>[Install]<br data-filtered="filtered">
+WantedBy=multi-user.target</p></blockquote>
+<p>保存退出</p>
+<h3>启动服务</h3>
+<blockquote>
+<div id="crayon-57ccf8c4f20cf553893103-1" class="crayon-line"><span class="crayon-e">systemctl </span><span class="crayon-e">enable </span><span class="crayon-e">shadowsocks</span></div>
+<div id="crayon-57ccf8c4f20cf553893103-2" class="crayon-line crayon-striped-line"><span class="crayon-e">systemctl </span><span class="crayon-e">start </span><span class="crayon-v">shadowsocks</span></div>
+</blockquote>
+<h3 class="crayon-line crayon-striped-line">配置防火墙</h3>
+<blockquote><p>firewall-cmd –permanent –add-port=8989/tcp<br data-filtered="filtered">
+firewall-cmd –permanent –add-port=8989/udp<br data-filtered="filtered">
+firewall-cmd –reload</p></blockquote>
+<p>到这里基本就可以了。客户端的使用方法还请自行搜索一下。</p>
+<p>参考文章：<br data-filtered="filtered">
+<a href="https://www.ifshow.com/centos-7-installation-and-configuration-shadowsocks/">Centos 7安装配置Shadowsocks</a><br data-filtered="filtered">
+<a href="https://blog.itnmg.net/shadowsocks/">CentOS 7 安装 Shadowsocks 科学上网</a></p>
+<p>因时间有点久，搭建的过程主要是参考资料以及查看配置来写的，如果有错误，还请原谅。</p>
+<p>附多用户的配置格式：</p>
+<p>{<br data-filtered="filtered">
+“server”:”0.0.0.0″,<br data-filtered="filtered">
+“local_address”:”127.0.0.1″,<br data-filtered="filtered">
+“local_port”:1080,<br data-filtered="filtered">
+“timeout”:600,<br data-filtered="filtered">
+“method”:”aes-256-cfb”,<br data-filtered="filtered">
+“port_password”:<br data-filtered="filtered">
+{<br data-filtered="filtered">
+“8991”:”A用户密码”,<br data-filtered="filtered">
+“8992”:”B用户密码”<br data-filtered="filtered">
+}<br data-filtered="filtered">
+}</p>
+	</div><!-- .entry-content -->
+
+	
+<div class="author-info">
+	<h2 class="author-heading">发布者</h2>
+	<div class="author-avatar">
+		<img alt="" src="./CentOS 7 搭建ShadowSocks(ss)服务器 _ RyanTech&#39;s blog_files/d22125c55e4279f15e1a339bdd4510ca" srcset="http://1.gravatar.com/avatar/d22125c55e4279f15e1a339bdd4510ca?s=112&amp;d=mm&amp;r=g 2x" class="avatar avatar-56 photo" height="56" width="56">	</div><!-- .author-avatar -->
+
+	<div class="author-description">
+		<h3 class="author-title">ryantech</h3>
+
+		<p class="author-bio">
+			仍然是一个程序员			<a class="author-link" href="http://ryantech.top/posts/author/ryantech" rel="author">
+				查看所有由ryantech发布的文章			</a>
+		</p><!-- .author-bio -->
+
+	</div><!-- .author-description -->
+</div><!-- .author-info -->
+
+	<footer class="entry-footer">
+		<span class="posted-on"><span class="screen-reader-text">发布于 </span><a href="http://ryantech.top/posts/16" rel="bookmark"><time class="entry-date published" datetime="2016-09-05T22:15:52+00:00">2016年9月5日</time><time class="updated" datetime="2016-09-21T10:09:59+00:00">2016年9月21日</time></a></span><span class="byline"><span class="author vcard"><span class="screen-reader-text">作者 </span><a class="url fn n" href="http://ryantech.top/posts/author/ryantech">ryantech</a></span></span><span class="cat-links"><span class="screen-reader-text">分类 </span><a href="http://ryantech.top/posts/category/%e6%8a%80%e6%9c%af" rel="category tag">技术</a></span>			</footer><!-- .entry-footer -->
+
+</article><!-- #post-## -->
+
+	<nav class="navigation post-navigation" role="navigation">
+		<h2 class="screen-reader-text">文章导航</h2>
+		<div class="nav-links"><div class="nav-previous"><a href="http://ryantech.top/posts/1" rel="prev"><span class="meta-nav" aria-hidden="true">上一</span> <span class="screen-reader-text">上篇文章：</span> <span class="post-title">搭建自己的Blog</span></a></div><div class="nav-next"><a href="http://ryantech.top/posts/22" rel="next"><span class="meta-nav" aria-hidden="true">继续</span> <span class="screen-reader-text">下篇文章：</span> <span class="post-title">MongoDB从2.x升级到3.x后启动失败</span></a></div></div>
+	</nav>
+		</main><!-- .site-main -->
+	</div><!-- .content-area -->
+
+
+	</div><!-- .site-content -->
+
+	<footer id="colophon" class="site-footer" role="contentinfo">
+		<div class="site-info">
+						<div>当你努力的时候，你觉得自己已经全力以赴了。</div>
+			<div>当你全力以赴的时候，你觉得自己还不够努力。</div>
+		</div><!-- .site-info -->
+	</footer><!-- .site-footer -->
+
+</div><!-- .site -->
+
+<script type="text/javascript" src="./CentOS 7 搭建ShadowSocks(ss)服务器 _ RyanTech&#39;s blog_files/skip-link-focus-fix.js"></script>
+<script type="text/javascript">
+/* <![CDATA[ */
+var screenReaderText = {"expand":"<span class=\"screen-reader-text\">\u5c55\u5f00\u5b50\u83dc\u5355<\/span>","collapse":"<span class=\"screen-reader-text\">\u6298\u53e0\u5b50\u83dc\u5355<\/span>"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="./CentOS 7 搭建ShadowSocks(ss)服务器 _ RyanTech&#39;s blog_files/functions.js"></script>
+<script type="text/javascript" src="./CentOS 7 搭建ShadowSocks(ss)服务器 _ RyanTech&#39;s blog_files/wp-embed.min.js"></script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-83983989-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+</body></html>

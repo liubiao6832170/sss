@@ -1,1 +1,2 @@
 https://kiwivm.64clouds.com/main-exec.php?mode=extras_shadowsocks       一键搬瓦工
+https://sourceforge.net/projects/shadowsocksgui/files/dist/                              ss软件下载地址
