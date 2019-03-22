@@ -1,0 +1,58 @@
+启动：service shadowsocks start
+停止：service shadowsocks stop
+重启：service shadowsocks restart
+状态：service shadowsocks status
+
+
+
+
+
+CentOS7设置ss开机启动
+配置自启动
+新建启动脚本文件/etc/systemd/system/shadowsocks.service，内容如下：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+[Unit]
+Description=Shadowsocks
+
+[Service]
+TimeoutStartSec=0
+ExecStart=/usr/bin/ssserver -c /etc/shadowsocks.json
+
+[Install]
+WantedBy=multi-user.target
+执行以下命令启动 shadowsocks 服务：
+
+1
+2
+$ systemctl enable shadowsocks
+$ systemctl start shadowsocks
+为了检查 shadowsocks 服务是否已成功启动，可以执行以下命令查看服务的状态：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+[root@kevin ~]# systemctl status ssserver -l
+* ssserver.service - Ssserver
+   Loaded: loaded (/etc/systemd/system/ssserver.service; enabled; vendor preset: disabled)
+   Active: active (running) since Thu 2017-08-03 05:56:09 UTC; 23s ago
+ Main PID: 691 (ssserver)
+   CGroup: /system.slice/ssserver.service
+           `-691 /usr/bin/python2 /usr/bin/ssserver -c /etc/shadowsocks.json --log-file /var/log/shadowsocks.log start
