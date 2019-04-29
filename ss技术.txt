@@ -1,1 +1,2 @@
 systemd.service — 服务单元配置
+putty  windows链接服务器

@@ -5,6 +5,32 @@
 
 
 
+#安装 python setup tools
+yum install python-setuptools -y
+#安装pip
+easy_install pip
+#升级 pip
+pip install –upgrade pip
+#安装 shadowsocks
+pip install shadowsocks
+
+
+配置Shadowsocks
+vi /etc/shadowsocks.json
+
+然后对照下面的修改
+{
+    "server":"server_ip",
+    "port_password":{
+        "port_1":"pwd1",
+        "port_2":"pwd2",
+        "port_3":"pwd3"
+    },
+    "local_address":"127.0.0.1",
+    "local_port":1080,
+    "timeout":300,
+    "method":"aes-256-cfb"
+}
 
 
 CentOS7设置ss开机启动
@@ -20,15 +46,22 @@ CentOS7设置ss开机启动
 7
 8
 9
+
+
+
 [Unit]
 Description=Shadowsocks
-
+After=network.target
+ 
 [Service]
 TimeoutStartSec=0
 ExecStart=/usr/bin/ssserver -c /etc/shadowsocks.json
-
+ 
 [Install]
 WantedBy=multi-user.target
+
+
+
 执行以下命令启动 shadowsocks 服务：
 
 1
@@ -56,3 +89,24 @@ $ systemctl start shadowsocks
  Main PID: 691 (ssserver)
    CGroup: /system.slice/ssserver.service
            `-691 /usr/bin/python2 /usr/bin/ssserver -c /etc/shadowsocks.json --log-file /var/log/shadowsocks.log start
+
+启动： systemctl start firewalld 
+
+关闭： systemctl stop firewalld 
+
+查看状态： systemctl status firewalld 
+
+开机禁用 ： systemctl disable firewalld 
+
+开机启用 ： systemctl enable firewalld
+
+永久开发端口
+firewall-cmd --permanent --zone=public --add-port=80/tcp
+移除80端口号：
+
+firewall-cmd --permanent --zone=public --remove-port=80/tcp
+--------------------- 
+作者：君丶梦寻 
+来源：CSDN 
+原文：https://blog.csdn.net/rankawin/article/details/81329417 
+版权声明：本文为博主原创文章，转载请附上博文链接！
