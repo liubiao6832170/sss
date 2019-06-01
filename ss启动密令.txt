@@ -35,7 +35,8 @@ vi /etc/shadowsocks.json
 
 CentOS7设置ss开机启动
 配置自启动
-新建启动脚本文件/etc/systemd/system/shadowsocks.service，内容如下：
+新建启动脚本文件
+vi /etc/systemd/system/shadowsocks.service，内容如下：
 
 1
 2
@@ -82,7 +83,7 @@ $ systemctl start shadowsocks
 10
 11
 12
-[root@kevin ~]# systemctl status ssserver -l
+[root@kevin ~]# systemctl status shadowsocks -l
 * ssserver.service - Ssserver
    Loaded: loaded (/etc/systemd/system/ssserver.service; enabled; vendor preset: disabled)
    Active: active (running) since Thu 2017-08-03 05:56:09 UTC; 23s ago
@@ -110,3 +111,11 @@ firewall-cmd --permanent --zone=public --remove-port=80/tcp
 来源：CSDN 
 原文：https://blog.csdn.net/rankawin/article/details/81329417 
 版权声明：本文为博主原创文章，转载请附上博文链接！
+
+一键 bbr
+wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh && chmod +x bbr.sh && ./bbr.sh
+
+检查BBR是否已经开启
+# lsmod | grep bbr
+# sysctl net.ipv4.tcp_available_congestion_control
+# sysctl net.ipv4.tcp_congestion_control
